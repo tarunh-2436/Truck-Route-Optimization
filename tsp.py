@@ -2,10 +2,8 @@ import requests
 import json
 from ortools.constraint_solver import routing_enums_pb2, pywrapcp
 
-# OpenRouteService API Key (Sign up at openrouteservice.org)
 API_KEY = "5b3ce3597851110001cf6248373813f428a84f8fa02d0c2693de0d44"
 
-# Function to get coordinates using OpenRouteService Geocoding API
 def get_coordinates(location):
     url = f"https://api.openrouteservice.org/geocode/search?api_key={API_KEY}&text={location}"
     
@@ -20,9 +18,8 @@ def get_coordinates(location):
     print(f"❌ No coordinates found for {location}")
     return None
 
-# Function to get the distance matrix from OpenRouteService
 def get_distance_matrix(locations):
-    coords = [[lon, lat] for lat, lon in locations]  # ORS requires [lon, lat] format
+    coords = [[lon, lat] for lat, lon in locations]  
     url = "https://api.openrouteservice.org/v2/matrix/driving-car"
     
     headers = {
@@ -40,26 +37,22 @@ def get_distance_matrix(locations):
     if response.status_code == 200:
         data = response.json()
         if "distances" in data:
-            # Convert float distances to integers (meters)
             return [[int(dist) if dist is not None else 999999 for dist in row] for row in data["distances"]]
         else:
             print("❌ Distance matrix missing in response")
-            print("Response:", data)  # Debugging
+            print("Response:", data)  
     else:
         print(f"❌ Error in distance API: {response.status_code}")
-        print("Response:", response.text)  # Debugging
+        print("Response:", response.text) 
     
     return None
 
-# Solves TSP using OR-Tools
 def solve_tsp(distance_matrix):
     num_locations = len(distance_matrix)
     
-    # Create Routing Index Manager
     manager = pywrapcp.RoutingIndexManager(num_locations, 1, 0)
     routing = pywrapcp.RoutingModel(manager)
 
-    # Distance callback function
     def distance_callback(from_index, to_index):
         from_node = manager.IndexToNode(from_index)
         to_node = manager.IndexToNode(to_index)
@@ -83,7 +76,6 @@ def solve_tsp(distance_matrix):
         return route
     return None
 
-# Main function
 def main():
     num_locations = int(input("Enter number of locations: "))
     locations = []
@@ -106,7 +98,6 @@ def main():
         print("❌ Unable to get distance matrix. Exiting.")
         return
 
-    # Solve TSP
     route = solve_tsp(distance_matrix)
     
     if route:
