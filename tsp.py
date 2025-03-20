@@ -15,7 +15,7 @@ def get_coordinates(location):
             lon, lat = data["features"][0]["geometry"]["coordinates"]
             return float(lat), float(lon)
     
-    print(f"❌ No coordinates found for {location}")
+    print(f"No coordinates found for {location}")
     return None
 
 def get_distance_matrix(locations):
@@ -39,10 +39,10 @@ def get_distance_matrix(locations):
         if "distances" in data:
             return [[int(dist) if dist is not None else 999999 for dist in row] for row in data["distances"]]
         else:
-            print("❌ Distance matrix missing in response")
+            print("Distance matrix missing in response")
             print("Response:", data)  
     else:
-        print(f"❌ Error in distance API: {response.status_code}")
+        print(f"Error in distance API: {response.status_code}")
         print("Response:", response.text) 
     
     return None
@@ -89,13 +89,13 @@ def main():
             locations.append(place)
 
     if len(coordinates) < 2:
-        print("❌ Not enough valid locations to proceed!")
+        print("Not enough valid locations to proceed!")
         return
     
     distance_matrix = get_distance_matrix(coordinates)
     
     if not distance_matrix:
-        print("❌ Unable to get distance matrix. Exiting.")
+        print("Unable to get distance matrix. Exiting.")
         return
 
     route = solve_tsp(distance_matrix)
@@ -105,7 +105,7 @@ def main():
         for i in route:
             print(f"{i+1}. {locations[i]}")
     else:
-        print("❌ Could not solve TSP.")
+        print("Could not solve TSP.")
 
 if __name__ == "__main__":
     main()
